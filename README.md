@@ -453,6 +453,4 @@ git push -u origin main
 
 ---
 
-**Day 31 Complete! 🎉 Tomorrow Day 32 — Docker project revision + Jenkins prep!**
 
-> Resources: [Shubham Londhe Docker One Shot](https://www.youtube.com/watch?v=docker-one-shot) | [Docker Docs](https://docs.docker.com)
