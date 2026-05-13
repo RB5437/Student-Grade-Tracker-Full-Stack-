@@ -1,31 +1,22 @@
-version: "3.9"
-
-networks:
-  grade-tracker-net:
-    driver: bridge
-    name: grade-tracker-net
-
-volumes:
-  mysql-data:
-    name: grade-tracker-mysql-data
-  backend-logs:
-    name: grade-tracker-backend-logs
-
 services:
 
   mysql:
     image: mysql:8.0
     container_name: grade-tracker-mysql
     restart: unless-stopped
+
     environment:
       MYSQL_ROOT_PASSWORD: rootpass
       MYSQL_DATABASE: gradesdb
       MYSQL_USER: appuser
       MYSQL_PASSWORD: apppass
+
     volumes:
       - mysql-data:/var/lib/mysql
+
     networks:
       - grade-tracker-net
+
     healthcheck:
       test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpass"]
       interval: 10s
@@ -37,20 +28,29 @@ services:
     build:
       context: ./backend
       dockerfile: Dockerfile
+
     container_name: grade-tracker-backend
     restart: unless-stopped
+
+    ports:
+      - "5000:5000"
+
     environment:
       DB_HOST: mysql
       DB_USER: root
       DB_PASSWORD: rootpass
       DB_NAME: gradesdb
+
     volumes:
       - backend-logs:/app/logs
+
     networks:
       - grade-tracker-net
+
     depends_on:
       mysql:
         condition: service_healthy
+
     healthcheck:
       test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://localhost:5000/health')"]
       interval: 30s
@@ -62,17 +62,30 @@ services:
     build:
       context: ./frontend
       dockerfile: Dockerfile
+
     container_name: grade-tracker-frontend
     restart: unless-stopped
+
     ports:
       - "80:80"
+
     networks:
       - grade-tracker-net
+
     depends_on:
       backend:
         condition: service_healthy
+
     healthcheck:
       test: ["CMD", "wget", "-qO-", "http://localhost/health"]
       interval: 30s
       timeout: 5s
       retries: 3
+
+networks:
+  grade-tracker-net:
+    driver: bridge
+
+volumes:
+  mysql-data:
+  backend-logs:

@@ -41,6 +41,8 @@ def init_db():
     conn.close()
     print("DB initialized!")
 
+init_db()
+
 @app.route("/health")
 def health():
     return jsonify({"status": "healthy", "service": "grade-tracker-backend"})
